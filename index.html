@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Farm Tycoon 2D - v1.0.2</title>
+    <title>Super Farm Tycoon 2D - v1.0.6</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <!-- Màn hình Game chính -->
+    <!-- Màn hình Game chính v1.0.6 -->
     <div class="game-wrapper hidden" id="game-app">
         <div class="weather-banner" id="weather-banner">
             <span id="weather-icon">[Nắng]</span> <span id="weather-text">Mùa Hè - Giá Bán Tăng +20%</span>
@@ -44,6 +44,8 @@
             </div>
             <div class="user-info-section">
                 <span id="user-display">👤 Guest</span>
+                <button class="btn-sync export-btn" onclick="exportSaveCode()" title="Copy mã để chơi ở máy khác">📤 Xuất Mã Lưu</button>
+                <button class="btn-sync import-btn" onclick="importSaveCode()" title="Dán mã từ máy khác sang">📥 Nhập Mã Lưu</button>
                 <button class="btn-logout" onclick="logout()">Đăng xuất</button>
             </div>
             <div class="currency-section">
