@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Farm Tycoon 2D - v1.0.2</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Màn hình Đăng ký / Đăng nhập -->
+    <div class="auth-overlay" id="auth-modal">
+        <div class="auth-card">
+            <h2>🌾 Super Farm 2D</h2>
+            <p id="auth-subtitle">Đăng nhập hoặc đăng ký tài khoản mới</p>
+
+            <div class="auth-form">
+                <input type="text" id="auth-username" placeholder="Tên đăng nhập" autocomplete="off">
+                <input type="password" id="auth-password" placeholder="Mật khẩu">
+                
+                <button class="btn-action" id="btn-auth-submit" onclick="handleAuth()">Đăng Nhập</button>
+                <p class="auth-toggle" onclick="toggleAuthMode()">
+                    <span id="auth-toggle-text">Chưa có tài khoản? Đăng ký ngay</span>
+                </p>
+                <button class="btn-reset-all" onclick="hardResetGame()">🗑️ Xóa Toàn Bộ Dữ Liệu Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Màn hình Game chính -->
+    <div class="game-wrapper hidden" id="game-app">
+        <div class="weather-banner" id="weather-banner">
+            <span id="weather-icon">[Nắng]</span> <span id="weather-text">Mùa Hè - Giá Bán Tăng +20%</span>
+        </div>
+
+        <header class="top-bar">
+            <div class="profile-section">
+                <div class="level-badge" id="player-level">LV 1</div>
+                <div class="exp-container">
+                    <div class="exp-bar" id="exp-fill"></div>
+                    <span id="exp-text">0/50 XP</span>
+                </div>
+            </div>
+            <div class="user-info-section">
+                <span id="user-display">👤 Guest</span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+            <div class="currency-section">
+                <div class="stat-pill gold"><span>[Vàng]</span> <span id="gold-val">500</span></div>
+                <div class="stat-pill diamond"><span>[Kim Cương]</span> <span id="gem-val">30</span></div>
+            </div>
+        </header>
+
+        <main class="main-layout">
+            <aside class="sidebar">
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="switchTab('shop')">Hạt Giống</button>
+                    <button class="tab-btn" onclick="switchTab('barn')">Kho Đồ</button>
+                    <button class="tab-btn" onclick="switchTab('animals')">Chăn Nuôi</button>
+                    <button class="tab-btn highlight" onclick="switchTab('quests')">Nhiệm Vụ</button>
+                </div>
+
+                <div class="tab-content" id="tab-shop">
+                    <div class="crop-selector" id="shop-items"></div>
+                </div>
+
+                <div class="tab-content hidden" id="tab-barn">
+                    <div class="inventory-list" id="inventory-list"></div>
+                    <button class="btn-action sell-all-btn" onclick="sellAllInventory()">Bán Hết Nông Sản</button>
+                </div>
+
+                <div class="tab-content hidden" id="tab-animals">
+                    <div class="animal-shop" id="animal-shop"></div>
+                </div>
+
+                <div class="tab-content hidden" id="tab-quests">
+                    <div class="quest-list" id="quest-list"></div>
+                </div>
+            </aside>
+
+            <section class="farm-area">
+                <div class="farm-header">
+                    <h2>Vườn Cây Nông Trại</h2>
+                    <div class="tools-bar">
+                        <button class="btn-tool active" id="tool-plant" onclick="selectTool('plant')">Trồng Cây</button>
+                        <button class="btn-tool" id="tool-water" onclick="selectTool('water')">Bình Tưới (Giảm 50% tg)</button>
+                    </div>
+                </div>
+
+                <div class="farm-grid" id="farm-grid"></div>
+
+                <div class="factory-zone">
+                    <h3>🏭 20 Nhà Máy Chế Biến (Mua & Nâng Cấp Bằng 💎)</h3>
+                    <div class="factory-grid" id="factory-grid"></div>
+                </div>
+
+                <div class="animal-zone">
+                    <h3>🐄 Chuồng Trại Chăn Nuôi</h3>
+                    <div class="animal-grid" id="animal-grid"></div>
+                </div>
+
+                <button class="btn-action expand-btn" id="btn-expand" onclick="expandFarm()">Mở Đất Trồng</button>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

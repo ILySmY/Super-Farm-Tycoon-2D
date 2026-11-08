@@ -1,0 +1,666 @@
+// 100 Loại Cây Trồng
+const CROPS = {};
+const cropNames = [
+    'Lúa Mì', 'Cà Rốt', 'Bắp Ngô', 'Dâu Tây', 'Bí Ngô', 'Dưa Hấu', 'Khoai Tây', 'Cà Chua', 'Đậu Hà Lan', 'Củ Cải',
+    'Bắp Cải', 'Cà Tím', 'Bông Xanh', 'Tỏi Tây', 'Hành Tây', 'Dứa Vàng', 'Dưa Gang', 'Quả Kiwi', 'Xoài Cát', 'Thanh Long',
+    'Hoa Hướng Dương', 'Hoa Hồng', 'Nấm Đỏ', 'Hạt Mắc Ca', 'Trái Cây Thần', 'Cây Ngân Hà', 'Quả Rồng Thiêng', 'Cây Kim Tiền', 'Cây Ngọc Bích', 'Cây Vũ Trụ'
+];
+const cropEmojis = ['🌾', '🥕', '🌽', '🍓', '🎃', '🍉', '🥔', '🍅', '🌱', '🧅', '🥬', '🍆', '🥦', '🧄', '🍍', '🍈', '🥝', '🥭', '🐉', '🌻', '🌸', '🍄', '🌰', '🌿', '✨', '🌴', '💎', '💰', '🔮', '🌟'];
+
+for (let i = 1; i <= 100; i++) {
+    const id = `crop_${i}`;
+    const name = cropNames[i - 1] || `Cây Siêu Tầm Vóc #${i}`;
+    const emoji = cropEmojis[(i - 1) % cropEmojis.length];
+
+    let seedPrice;
+    if (i === 1) {
+        seedPrice = 15;
+    } else if (i === 100) {
+        seedPrice = 100000000000;
+    } else {
+        seedPrice = Math.round(15 * Math.pow(1.275, i - 1));
+    }
+
+    const sellValue = Math.round(seedPrice * 2.5);
+    const xp = Math.round(i * 45);
+    const growTime = 5 + i * 5;
+    const waterCost = Math.round(seedPrice * 0.1);
+
+    CROPS[id] = {
+        id: id,
+        name: name,
+        emoji: emoji,
+        seedPrice: seedPrice,
+        sellValue: sellValue,
+        xp: xp,
+        growTime: growTime,
+        levelReq: Math.floor((i - 1) / 4) + 1,
+        waterCost: waterCost
+    };
+}
+
+// 10 Loại Vật Nuôi
+const ANIMALS = {
+    chicken:  { id: 'chicken',  name: 'Gà',         emoji: '🐔', productEmoji: '🥚', price: 200,      yieldValue: 50,     produceTime: 10 },
+    cow:      { id: 'cow',      name: 'Bò',         emoji: '🐄', productEmoji: '🥛', price: 1000,     yieldValue: 250,    produceTime: 20 },
+    sheep:    { id: 'sheep',    name: 'Cừu',        emoji: '🐑', productEmoji: '🧶', price: 5000,     yieldValue: 1200,   produceTime: 35 },
+    pig:      { id: 'pig',      name: 'Lợn',        emoji: '🐖', productEmoji: '🥓', price: 20000,    yieldValue: 5000,   produceTime: 50 },
+    duck:     { id: 'duck',     name: 'Vịt',        emoji: '🦆', productEmoji: '🪶', price: 80000,    yieldValue: 20000,  produceTime: 70 },
+    goat:     { id: 'goat',     name: 'Dê',         emoji: '🐐', productEmoji: '🧀', price: 300000,   yieldValue: 75000,  produceTime: 90 },
+    goose:    { id: 'goose',    name: 'Ngỗng',      emoji: '🦢', productEmoji: '🪺', price: 1000000,  yieldValue: 250000, produceTime: 120 },
+    ostrich:  { id: 'ostrich',  name: 'Đà Điểu',    emoji: '🦃', productEmoji: '🥚', price: 4000000,  yieldValue: 1000000,produceTime: 150 },
+    camel:    { id: 'camel',    name: 'Lạc Đà',     emoji: '🐫', productEmoji: '🥛', price: 15000000, yieldValue: 4000000,produceTime: 190 },
+    royalcow: { id: 'royalcow', name: 'Bò Hoàng Gia',emoji: '🐂',productEmoji: '👑', price: 50000000, yieldValue: 13000000,produceTime: 240 }
+};
+
+// 20 Nhà Máy Chế Biến (Đồng bộ chuẩn nguyên liệu theo đúng số thứ tự cây tương ứng)
+const FACTORIES = {};
+const factoryEmojis = ['🍞', '🧃', '⚙️', '🍯', '🍷', '🍟', '🥫', '🧶', '🧀', '🥩', '☕', '🍫', '🍵', '🍪', '🥞', '🧈', '🥣', '🍬', '🍭', '🥧'];
+for (let i = 1; i <= 20; i++) {
+    const id = `factory_${i}`;
+    const cropTargetId = `crop_${i}`; // Nhà máy #i sẽ chế biến từ cây #i tương ứng
+    const targetCrop = CROPS[cropTargetId];
+    
+    FACTORIES[id] = {
+        id: id,
+        name: `Nhà Máy #${i}`,
+        emoji: factoryEmojis[(i - 1) % factoryEmojis.length],
+        gemCost: i * 15,
+        inputCrop: cropTargetId,
+        inputReq: 2,
+        output: `Sản Phẩm Tinh Luyện #${i}`,
+        // Giá trị chế biến cân bằng hợp lý dựa theo giá bán của chính loại cây đó nhân đôi
+        baseValue: targetCrop ? targetCrop.sellValue * 2 : i * 5000
+    };
+}
+
+let QUESTS = [];
+function generateQuests() {
+    let idCounter = 1;
+    Object.values(CROPS).forEach((crop, idx) => {
+        QUESTS.push({
+            id: idCounter++,
+            title: `Thu hoạch 40 ${crop.name} ${crop.emoji}`,
+            target: 40,
+            current: 0,
+            cropTarget: crop.id,
+            rewardGold: crop.seedPrice * 15,
+            rewardGem: 3 + Math.floor(idx / 4),
+            rewardXp: crop.xp * 10,
+            done: false
+        });
+    });
+
+    let totalTarget = 20;
+    for (let i = 1; i <= 30; i++) {
+        QUESTS.push({
+            id: idCounter++,
+            title: `Tổng thu hoạch ${totalTarget} sản phẩm bất kỳ`,
+            target: totalTarget,
+            current: 0,
+            isGeneralTotal: true,
+            rewardGold: totalTarget * 1000 * i,
+            rewardGem: 5 * i,
+            rewardXp: totalTarget * 30 * i,
+            done: false
+        });
+        totalTarget += 50;
+    }
+}
+generateQuests();
+
+const SEASONS = [
+    { id: 'summer', text: 'Mùa Hè - Giá Bán Tăng +20%', icon: '[Nắng]', multiplier: 1.2 },
+    { id: 'rain',   text: 'Mùa Mưa - Cây Lớn Nhanh x2', icon: '[Mưa]', multiplier: 1.0 },
+    { id: 'autumn', text: 'Mùa Thu - Tăng XP x1.5',     icon: '[Thu]', multiplier: 1.0 }
+];
+
+let currentUser = null;
+let isAuthSignUp = false;
+let currentSeasonIdx = 0;
+let currentTool = 'plant';
+
+function getFreshState() {
+    return {
+        gold: 500,
+        gems: 30,
+        level: 1,
+        xp: 0,
+        selectedCrop: 'crop_1',
+        inventory: {},
+        plots: [
+            { id: 0, state: 'empty', crop: null, timer: 0, totalTime: 0, watered: false },
+            { id: 1, state: 'empty', crop: null, timer: 0, totalTime: 0, watered: false },
+            { id: 2, state: 'empty', crop: null, timer: 0, totalTime: 0, watered: false },
+            { id: 3, state: 'empty', crop: null, timer: 0, totalTime: 0, watered: false }
+        ],
+        ownedAnimals: [],
+        ownedFactories: {}
+    };
+}
+
+let state = getFreshState();
+
+function hardResetGame() {
+    if (confirm('Bạn có chắc muốn xóa toàn bộ tài khoản và dữ liệu cũ không?')) {
+        localStorage.removeItem('super_farm_users_v105');
+        for(let i=0; i<localStorage.length; i++) {
+            let key = localStorage.key(i);
+            if(key && key.includes('super_farm')) {
+                localStorage.removeItem(key);
+            }
+        }
+        alert('Đã dọn dẹp sạch sẽ toàn bộ dữ liệu!');
+        location.reload();
+    }
+}
+
+function toggleAuthMode() {
+    isAuthSignUp = !isAuthSignUp;
+    document.getElementById('auth-subtitle').innerText = isAuthSignUp ? 'Tạo tài khoản mới' : 'Đăng nhập hoặc đăng ký tài khoản mới';
+    document.getElementById('btn-auth-submit').innerText = isAuthSignUp ? 'Đăng Ký' : 'Đăng Nhập';
+    document.getElementById('auth-toggle-text').innerText = isAuthSignUp ? 'Đã có tài khoản? Đăng nhập' : 'Chưa có tài khoản? Đăng ký ngay';
+}
+
+function handleAuth() {
+    const user = document.getElementById('auth-username').value.trim();
+    const pass = document.getElementById('auth-password').value.trim();
+
+    if (!user || !pass) {
+        alert('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!');
+        return;
+    }
+
+    const usersData = JSON.parse(localStorage.getItem('super_farm_users_v105') || '{}');
+
+    if (isAuthSignUp) {
+        if (usersData[user]) {
+            alert('Tên tài khoản này đã tồn tại!');
+            return;
+        }
+        usersData[user] = { password: pass };
+        localStorage.setItem('super_farm_users_v105', JSON.stringify(usersData));
+        alert('Đăng ký thành công! Hãy đăng nhập ngay.');
+        toggleAuthMode();
+    } else {
+        if (!usersData[user] || usersData[user].password !== pass) {
+            alert('Sai tên đăng nhập hoặc mật khẩu!');
+            return;
+        }
+        currentUser = user;
+        document.getElementById('user-display').innerText = `👤 ${currentUser}`;
+        document.getElementById('auth-modal').classList.add('hidden');
+        document.getElementById('game-app').classList.remove('hidden');
+        
+        loadGame();
+        initGame();
+    }
+}
+
+function logout() {
+    saveGame();
+    currentUser = null;
+    document.getElementById('game-app').classList.add('hidden');
+    document.getElementById('auth-modal').classList.remove('hidden');
+}
+
+function initGame() {
+    renderShop();
+    renderAnimalsShop();
+    renderFarm();
+    renderAnimalsZone();
+    renderFactoriesZone();
+    renderBarn();
+    renderQuests();
+    updateUI();
+
+    setInterval(gameLoop, 1000);
+    setInterval(rotateSeason, 35000);
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    event.target.classList.add('active');
+    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+}
+
+function selectTool(tool) {
+    currentTool = tool;
+    document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`tool-${tool}`).classList.add('active');
+}
+
+function rotateSeason() {
+    currentSeasonIdx = (currentSeasonIdx + 1) % SEASONS.length;
+    const season = SEASONS[currentSeasonIdx];
+    document.getElementById('weather-icon').innerText = season.icon;
+    document.getElementById('weather-text').innerText = season.text;
+}
+
+function renderShop() {
+    const shop = document.getElementById('shop-items');
+    shop.innerHTML = '';
+    Object.values(CROPS).forEach(crop => {
+        const isLocked = state.level < crop.levelReq;
+        const card = document.createElement('div');
+        card.className = `crop-card ${state.selectedCrop === crop.id ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
+        card.innerHTML = `
+            <div style="font-size:20px">${crop.emoji}</div>
+            <div>
+                <h4 style="font-size:11px">${crop.name} ${isLocked ? `(Lv${crop.levelReq})` : ''}</h4>
+                <p style="font-size:9px; color:#64748b">Giá: ${crop.seedPrice.toLocaleString()}🪙 | Tg: ${crop.growTime}s</p>
+            </div>
+        `;
+        if (!isLocked) card.onclick = () => { state.selectedCrop = crop.id; renderShop(); };
+        shop.appendChild(card);
+    });
+}
+
+function renderAnimalsShop() {
+    const shop = document.getElementById('animal-shop');
+    shop.innerHTML = '';
+    Object.values(ANIMALS).forEach(animal => {
+        const card = document.createElement('div');
+        card.className = 'animal-card';
+        card.innerHTML = `
+            <div style="font-size:20px">${animal.emoji}</div>
+            <div>
+                <h4 style="font-size:11px">${animal.name}</h4>
+                <p style="font-size:9px; color:#64748b">Giá: ${animal.price.toLocaleString()}🪙</p>
+            </div>
+        `;
+        card.onclick = () => buyAnimal(animal.id);
+        shop.appendChild(card);
+    });
+}
+
+function buyAnimal(animalId) {
+    const animal = ANIMALS[animalId];
+    if (state.gold >= animal.price) {
+        state.gold -= animal.price;
+        state.ownedAnimals.push({ id: animal.id, timer: animal.produceTime, ready: false });
+        updateUI();
+        renderAnimalsZone();
+        saveGame();
+    } else {
+        alert('Không đủ vàng mua vật nuôi!');
+    }
+}
+
+function renderAnimalsZone() {
+    const grid = document.getElementById('animal-grid');
+    grid.innerHTML = '';
+    if (state.ownedAnimals.length === 0) {
+        grid.innerHTML = '<p style="font-size:10px; color:#94a3b8">Chưa có vật nuôi nào. Hãy vào tab Chăn Nuôi để mua!</p>';
+        return;
+    }
+    state.ownedAnimals.forEach((anim, idx) => {
+        const config = ANIMALS[anim.id];
+        const plot = document.createElement('div');
+        plot.className = 'animal-plot';
+        plot.innerHTML = `<span>${config.emoji}</span><span>${anim.ready ? config.productEmoji + ' Thu' : anim.timer + 's'}</span>`;
+        plot.onclick = (e) => harvestAnimal(idx, e);
+        grid.appendChild(plot);
+    });
+}
+
+function harvestAnimal(idx, event) {
+    const anim = state.ownedAnimals[idx];
+    if (anim.ready) {
+        const config = ANIMALS[anim.id];
+        state.gold += config.yieldValue;
+        anim.ready = false;
+        anim.timer = config.produceTime;
+        createFloatingText(event.clientX, event.clientY, `+${config.yieldValue.toLocaleString()}🪙`, '#ffd700');
+        updateUI();
+        renderAnimalsZone();
+        saveGame();
+    }
+}
+
+function renderFactoriesZone() {
+    const grid = document.getElementById('factory-grid');
+    grid.innerHTML = '';
+    Object.values(FACTORIES).forEach(fac => {
+        if (!state.ownedFactories[fac.id]) state.ownedFactories[fac.id] = null;
+        let facData = state.ownedFactories[fac.id];
+        const isOwned = !!facData;
+        const item = document.createElement('div');
+        item.className = 'factory-item';
+
+        const cropNeeded = CROPS[fac.inputCrop] ? CROPS[fac.inputCrop].name : 'Nông sản';
+
+        if (isOwned) {
+            if (!facData.level) facData.level = 1;
+            const upgradeCost = facData.level * 15;
+
+            item.innerHTML = `
+                <span>${fac.emoji}</span>
+                <div>
+                    <div>${fac.name} (Lv${facData.level})</div>
+                    <div style="font-size:8px; color:#16a34a">Chế biến (2 ${cropNeeded})</div>
+                    <div style="font-size:8px; color:#2563eb" onclick="event.stopPropagation(); upgradeFactory('${fac.id}')">Nâng cấp: ${upgradeCost} 💎</div>
+                </div>
+            `;
+            item.onclick = () => produceFactoryItem(fac.id);
+        } else {
+            item.innerHTML = `
+                <span>${fac.emoji}</span>
+                <div>
+                    <div>${fac.name}</div>
+                    <div style="font-size:9px; color:#2563eb">Mua: ${fac.gemCost} 💎</div>
+                </div>
+            `;
+            item.onclick = () => buyFactory(fac.id);
+        }
+        grid.appendChild(item);
+    });
+}
+
+function buyFactory(facId) {
+    const fac = FACTORIES[facId];
+    if (state.gems >= fac.gemCost) {
+        state.gems -= fac.gemCost;
+        state.ownedFactories[facId] = { level: 1 };
+        updateUI();
+        renderFactoriesZone();
+        saveGame();
+    } else {
+        alert('Bạn không đủ Kim Cương 💎!');
+    }
+}
+
+function upgradeFactory(facId) {
+    const facData = state.ownedFactories[facId];
+    if (!facData) return;
+    const cost = facData.level * 15;
+    if (state.gems >= cost) {
+        state.gems -= cost;
+        facData.level += 1;
+        updateUI();
+        renderFactoriesZone();
+        saveGame();
+    } else {
+        alert(`Bạn cần ${cost} 💎 để nâng cấp!`);
+    }
+}
+
+function produceFactoryItem(facId) {
+    const fac = FACTORIES[facId];
+    let facData = state.ownedFactories[facId];
+    if (!facData) return;
+    if (!facData.level) facData.level = 1;
+
+    const inputCropId = fac.inputCrop;
+    const currentCount = state.inventory[inputCropId] || 0;
+
+    if (currentCount >= 2) {
+        state.inventory[inputCropId] -= 2;
+        const totalValue = Math.round(fac.baseValue * facData.level);
+        state.gold += totalValue;
+        createFloatingText(window.innerWidth / 2, window.innerHeight / 2, `+${totalValue.toLocaleString()}🪙 (${fac.output} Lv${facData.level})`, '#ffd700');
+        updateUI();
+        renderBarn();
+        saveGame();
+    } else {
+        const cropName = CROPS[inputCropId] ? CROPS[inputCropId].name : 'nguyên liệu';
+        alert(`Bạn cần có đủ 2 ${cropName} trong kho để chế biến!`);
+    }
+}
+
+function renderFarm() {
+    const grid = document.getElementById('farm-grid');
+    grid.innerHTML = '';
+
+    state.plots.forEach(plot => {
+        const plotEl = document.createElement('div');
+        plotEl.className = `plot ${plot.watered ? 'watered' : ''}`;
+        let emoji = '🟫';
+        let progressPercent = 0;
+
+        if (plot.state === 'growing') {
+            emoji = '🌱';
+            progressPercent = ((plot.totalTime - plot.timer) / plot.totalTime) * 100;
+        } else if (plot.state === 'ready') {
+            emoji = CROPS[plot.crop] ? CROPS[plot.crop].emoji : '🌾';
+            progressPercent = 100;
+        }
+
+        plotEl.innerHTML = `
+            <div class="plot-emoji">${emoji}</div>
+            ${plot.state === 'growing' ? `<div class="progress-wrap"><div class="progress-bar" style="width: ${progressPercent}%"></div></div>` : ''}
+        `;
+
+        plotEl.onclick = (e) => handlePlotClick(plot, e);
+        grid.appendChild(plotEl);
+    });
+}
+
+function handlePlotClick(plot, event) {
+    const crop = CROPS[state.selectedCrop];
+    if (currentTool === 'water' && plot.state === 'growing' && !plot.watered) {
+        if (state.gold >= crop.waterCost) {
+            state.gold -= crop.waterCost;
+            plot.watered = true;
+            plot.timer = Math.ceil(plot.timer / 2);
+            createFloatingText(event.clientX, event.clientY, `-${crop.waterCost.toLocaleString()}🪙 💧`, '#0284c7');
+            updateUI();
+            renderFarm();
+        } else {
+            alert(`Cần ${crop.waterCost.toLocaleString()}🪙 để tưới nước!`);
+        }
+    } else if (currentTool === 'plant') {
+        if (plot.state === 'empty') {
+            if (state.gold >= crop.seedPrice) {
+                state.gold -= crop.seedPrice;
+                plot.state = 'growing';
+                plot.crop = crop.id;
+                plot.timer = crop.growTime;
+                plot.totalTime = crop.growTime;
+                plot.watered = false;
+                createFloatingText(event.clientX, event.clientY, `-${crop.seedPrice.toLocaleString()}🪙`, '#ff5252');
+            } else {
+                alert('Bạn không đủ tiền mua hạt giống này!');
+            }
+        } else if (plot.state === 'ready') {
+            const harvestedCrop = CROPS[plot.crop] || CROPS['crop_1'];
+            state.inventory[plot.crop] = (state.inventory[plot.crop] || 0) + 1;
+            addXP(harvestedCrop.xp);
+            createFloatingText(event.clientX, event.clientY, `+1 ${harvestedCrop.emoji}`, '#4caf50');
+
+            updateAllQuests(plot.crop);
+
+            plot.state = 'empty';
+            plot.crop = null;
+            plot.timer = 0;
+            plot.watered = false;
+        }
+    }
+    updateUI();
+    renderFarm();
+    renderBarn();
+    renderQuests();
+    saveGame();
+}
+
+function renderBarn() {
+    const list = document.getElementById('inventory-list');
+    list.innerHTML = '';
+    let total = 0;
+    Object.keys(state.inventory).forEach(cropId => {
+        const count = state.inventory[cropId];
+        if (count > 0) {
+            total += count;
+            const crop = CROPS[cropId];
+            const card = document.createElement('div');
+            card.className = 'inv-card';
+            card.innerHTML = `<div style="font-size:18px">${crop ? crop.emoji : '📦'}</div><div><h4 style="font-size:10px">${crop ? crop.name : cropId} x${count}</h4><p style="font-size:8px; color:#64748b">Giá: ${Math.round((crop ? crop.sellValue : 50) * SEASONS[currentSeasonIdx].multiplier).toLocaleString()}🪙</p></div>`;
+            list.appendChild(card);
+        }
+    });
+    if (total === 0) list.innerHTML = '<p style="font-size:10px; color:#94a3b8">Kho trống.</p>';
+}
+
+function sellAllInventory() {
+    let earned = 0;
+    const seasonMult = SEASONS[currentSeasonIdx].multiplier;
+    Object.keys(state.inventory).forEach(cropId => {
+        const count = state.inventory[cropId];
+        if (count > 0) {
+            const crop = CROPS[cropId];
+            earned += Math.round((crop ? crop.sellValue : 50) * seasonMult) * count;
+            state.inventory[cropId] = 0;
+        }
+    });
+
+    if (earned > 0) {
+        state.gold += earned;
+        alert(`Bán kho thu về ${earned.toLocaleString()} 🪙!`);
+        updateUI();
+        renderBarn();
+        saveGame();
+    }
+}
+
+function renderQuests() {
+    const list = document.getElementById('quest-list');
+    list.innerHTML = '';
+    QUESTS.forEach(q => {
+        const card = document.createElement('div');
+        card.className = 'quest-card';
+        card.innerHTML = `
+            <div style="font-weight:bold; font-size:10px">${q.title} (${q.current}/${q.target})</div>
+            <div class="quest-reward">+${q.rewardGold.toLocaleString()}🪙 | +${q.rewardGem}💎 | +${q.rewardXp}XP</div>
+            ${q.done ? '<span style="color:#16a3a4; font-size:9px">✓ Đã nhận</span>' : `<button class="btn-action" style="padding:3px; font-size:9px" onclick="claimQuest(${q.id})">Nhận Thưởng</button>`}
+        `;
+        list.appendChild(card);
+    });
+}
+
+function updateAllQuests(harvestedCropId) {
+    QUESTS.forEach(q => {
+        if (!q.done) {
+            if (q.cropTarget && q.cropTarget === harvestedCropId) {
+                q.current += 1;
+                if (q.current > q.target) q.current = q.target;
+            } else if (q.isGeneralTotal) {
+                q.current += 1;
+                if (q.current > q.target) q.current = q.target;
+            }
+        }
+    });
+}
+
+function claimQuest(questId) {
+    const q = QUESTS.find(item => item.id === questId);
+    if (q && !q.done && q.current >= q.target) {
+        q.done = true;
+        state.gold += q.rewardGold;
+        state.gems += q.rewardGem;
+        addXP(q.rewardXp);
+        updateUI();
+        renderQuests();
+        saveGame();
+    } else {
+        alert('Chưa hoàn thành nhiệm vụ!');
+    }
+}
+
+function gameLoop() {
+    let hasChanges = false;
+    const speedMult = SEASONS[currentSeasonIdx].id === 'rain' ? 2 : 1;
+
+    state.plots.forEach(plot => {
+        if (plot.state === 'growing') {
+            plot.timer -= speedMult;
+            if (plot.timer <= 0) plot.state = 'ready';
+            hasChanges = true;
+        }
+    });
+
+    state.ownedAnimals.forEach(anim => {
+        if (!anim.ready) {
+            anim.timer -= 1;
+            if (anim.timer <= 0) anim.ready = true;
+            hasChanges = true;
+        }
+    });
+
+    if (hasChanges) {
+        renderFarm();
+        renderAnimalsZone();
+        saveGame();
+    }
+}
+
+function addXP(amount) {
+    state.xp += amount;
+    const maxXp = state.level * 50;
+    if (state.xp >= maxXp) {
+        state.xp -= maxXp;
+        state.level += 1;
+        state.gems += 5;
+        renderShop();
+    }
+}
+
+function expandFarm() {
+    const cost = state.plots.length * 2000;
+    if (state.gold >= cost) {
+        state.gold -= cost;
+        state.plots.push({ id: state.plots.length, state: 'empty', crop: null, timer: 0, totalTime: 0, watered: false });
+        updateUI();
+        renderFarm();
+        saveGame();
+    } else {
+        alert(`Cần ${cost.toLocaleString()}🪙 để mở ô đất!`);
+    }
+}
+
+function createFloatingText(x, y, text, color) {
+    const el = document.createElement('div');
+    el.className = 'float-text';
+    el.innerText = text;
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    el.style.color = color;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+}
+
+function updateUI() {
+    document.getElementById('gold-val').innerText = state.gold.toLocaleString();
+    document.getElementById('gem-val').innerText = state.gems;
+    document.getElementById('player-level').innerText = `LV ${state.level}`;
+    const maxXp = state.level * 50;
+    document.getElementById('exp-fill').style.width = `${(state.xp / maxXp) * 100}%`;
+    document.getElementById('exp-text').innerText = `${state.xp}/${maxXp} XP`;
+    document.getElementById('btn-expand').innerText = `Mở Đất (${(state.plots.length * 2000).toLocaleString()}🪙)`;
+}
+
+function saveGame() {
+    if (!currentUser) return;
+    localStorage.setItem(`super_farm_v105_${currentUser}`, JSON.stringify(state));
+}
+
+function loadGame() {
+    if (!currentUser) return;
+    const savedData = localStorage.getItem(`super_farm_v105_${currentUser}`);
+
+    if (savedData) {
+        state = { ...getFreshState(), ...JSON.parse(savedData) };
+    } else {
+        state = getFreshState();
+    }
+
+    if (state.ownedFactories) {
+        Object.keys(state.ownedFactories).forEach(facId => {
+            if (!state.ownedFactories[facId] || typeof state.ownedFactories[facId] !== 'object') {
+                state.ownedFactories[facId] = { level: 1 };
+            } else if (!state.ownedFactories[facId].level) {
+                state.ownedFactories[facId] = { level: 1 };
+            }
+        });
+    }
+}
